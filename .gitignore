@@ -57,3 +57,4 @@ buildout.in
 
 src/infi/rpc/__version__.py
 bootstrap.py
+doc/_build
