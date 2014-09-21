@@ -29,9 +29,9 @@ if on_rtd:
 
     # Install requirements and build the project
     run("easy_install -U infi.projector")
-    run("projector devenv build")
     run("projector requirements remove 'Logbook>=0.7.0.3'")  # this is to remove our internal Logbook implementation
     run("projector requirements add Logbook")
+    run("projector devenv build")
 
     os.chdir(curdir)
 
