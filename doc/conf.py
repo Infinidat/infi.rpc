@@ -29,7 +29,7 @@ if on_rtd:
 
     # Install requirements and build the project
     run("easy_install -U infi.projector")
-    run("projector devenv build")
+    run("projector devenv build --no-scripts")
 
     os.chdir(curdir)
 
