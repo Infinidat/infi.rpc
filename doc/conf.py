@@ -29,7 +29,9 @@ if on_rtd:
 
     # Install requirements and build the project
     run("easy_install -U infi.projector")
-    run("projector devenv build --no-scripts")
+    run("projector devenv build")
+    run("projector requirements remove 'Logbook>=0.7.0.3'")  # this is to remove our internal Logbook implementation
+    run("projector requirements add Logbook")
 
     os.chdir(curdir)
 
@@ -37,6 +39,7 @@ if on_rtd:
     sys.path.append(os.path.join(pardir, "src"))
     for egg in os.listdir(os.path.join(pardir, "eggs")):
         sys.path.append(os.path.join(pardir, "eggs", egg))
+
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
