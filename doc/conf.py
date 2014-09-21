@@ -15,6 +15,29 @@
 import sys
 import os
 
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+if on_rtd:
+    def run(cmd):
+        import subprocess
+        print "Running '{0}'".format(cmd)
+        if subprocess.Popen(cmd, shell=True).wait() != 0:
+            raise Exception("Command '{0}' failed".format(cmd))
+
+    curdir = os.path.abspath(os.curdir)
+    pardir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+    os.chdir(pardir)
+
+    # Install requirements and build the project
+    run("easy_install -U infi.projector")
+    run("projector devenv build")
+
+    os.chdir(curdir)
+
+    # Add everything to the pythonpath so that Sphinx can find it
+    sys.path.append(os.path.join(pardir, "src"))
+    for egg in os.listdir(os.path.join(pardir, "eggs")):
+        sys.path.append(os.path.join(pardir, "eggs", egg))
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
