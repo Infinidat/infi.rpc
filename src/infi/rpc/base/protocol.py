@@ -124,4 +124,4 @@ def decode_rpc_result(result_dict):
     if code in (RPC_RESULT_CODE_DEFERRED, RPC_RESULT_CODE_SUCCESS):
         return code, result.result
     else:
-        return code, RPCException.from_dict(result.exception)
+        return code, result.exception
