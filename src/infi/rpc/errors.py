@@ -37,15 +37,8 @@ class TimeoutExpired(RPCTransportException):
 
 
 class InternalServerError(RPCFrameworkException):
-    def __init__(self, *args, **kwargs):
-        super(InternalServerError, self).__init__(*args, **kwargs)
-        self.server_side_traceback = format_tb(exc_info()[2])
-
-    def to_dict(self, with_traceback=True):
-        result = super(InternalServerError, self).to_dict()
-        if with_traceback:
-            result['server_side_traceback'] = self.server_side_traceback
-        return result
+    def __init__(self, original_exception):
+        super(InternalServerError, self).__init__(str(original_exception), str(type(original_exception)))
 
 
 class InvalidReturnValue(RPCFrameworkException):
