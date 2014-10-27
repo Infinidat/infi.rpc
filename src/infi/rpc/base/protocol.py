@@ -92,7 +92,7 @@ def encode_rpc_result_exc_info(exc_info, with_traceback=None):
     if isinstance(exc_info[1], RPCException):
         result = encode_rpc_result_exception(exc_info[1])
     else:
-        result = InternalServerError(exc_info[1])
+        result = encode_rpc_result_exception(InternalServerError(exc_info[1]))
     if with_traceback is True or (with_traceback is None and getattr(exc_info[1], 'log_with_traceback', False)):
         result['server_side_traceback'] = json_traceback.format_tb(exc_info[2])
     return result
