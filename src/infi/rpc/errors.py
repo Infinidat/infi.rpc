@@ -38,7 +38,7 @@ class TimeoutExpired(RPCTransportException):
 
 class InternalServerError(RPCFrameworkException):
     def __init__(self, original_exception):
-        super(InternalServerError, self).__init__(str(original_exception), str(type(original_exception)))
+        super(InternalServerError, self).__init__("type={!r}, value={!r}".format(type(original_exception), original_exception))
 
 
 class InvalidReturnValue(RPCFrameworkException):
