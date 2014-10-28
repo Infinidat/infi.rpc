@@ -107,7 +107,7 @@ class ServerBase(SelfLoggerMixin):  # pragma: no cover
                 validate_call_arguments(method, rpc_call.args, rpc_call.kwargs)
             except InvalidCallArguments:
                 self.log_error("received invalid RPC arguments for method {}, returning error".format(rpc_call.method))
-                return encode_rpc_result_exc_info(sys.get_exc_info())
+                return encode_rpc_result_exc_info(sys.exc_info())
 
             result = handler(rpc_call)
             self.log_debug("replying to RPC request {} with {}".format(rpc_call, result))
