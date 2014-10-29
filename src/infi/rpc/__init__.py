@@ -1,6 +1,7 @@
 from .base import (ServiceBase, rpc_call, rpc_deferred, rpc_immediate, synchronized,
                    ServiceWithSynchronized, SyncServer, AsyncServer, Server, Client,
-                   AutoTimeoutClient, IPython_Mixin, DeferredResult, ImmediateResult, AsyncDeferredResult, strictify)
+                   AutoTimeoutClient, IPython_Mixin, DeferredResult, ImmediateResult, AsyncDeferredResult, strictify,
+                   patched_ipython_getargspec_context)
 from .zerorpc import ZeroRPCClientTransport, ZeroRPCServerTransport
 
 __all__ = [
@@ -9,5 +10,6 @@ __all__ = [
     'AutoTimeoutClient',
     'IPython_Mixin', 'DeferredResult', 'ImmediateResult', 'AsyncDeferredResult',
     'strictify',
-    'ZeroRPCClientTransport', 'ZeroRPCServerTransport'
+    'ZeroRPCClientTransport', 'ZeroRPCServerTransport',
+    'patched_ipython_getargspec_context'
 ]

@@ -5,6 +5,8 @@
 import sys
 from gevent import sleep
 from infi.pyutils.lazy import cached_method
+from infi.pyutils.contexts import contextmanager
+from infi.pyutils.decorators import _ipython_inspect_module
 
 from .. import errors
 from .utils import SelfLoggerMixin
@@ -269,3 +271,20 @@ class AutoTimeoutClient(Client):
         except errors.InvalidRPCMethod:
             self._server_max_response_time = -1
         return self._server_max_response_time
+
+
+@contextmanager
+def patched_ipython_getargspec_context(client):
+    original = _ipython_inspect_module.getargspec
+
+    @wraps(original)
+    def patched(func):
+        if hasattr(func, "rpc_call") and getattr(func, "rpc_call"):
+            return client.get_rpc_ipython_argspec(getattr(func, "rpc_method_name", func.__name__))
+        return original(func)
+    _ipython_inspect_module.getargspec = patched
+    _ipython_inspect_module.getargspec = patched
+    try:
+        yield
+    finally:
+        _ipython_inspect_module.getargspec = original
