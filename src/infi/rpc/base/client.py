@@ -211,6 +211,9 @@ class Client(SelfLoggerMixin):  # pragma: no cover
     def __str__(self):
         return repr(self)
 
+    def __dir__(self):
+        return dir(super(Client, self)) + self._get_rpc_method_names()
+
 
 class IPython_Mixin(object):
     """Mixin that shortcircuits IPython methods called when hitting <tab> so they won't get sent to the remote end."""

@@ -8,7 +8,7 @@ from uuid import uuid4
 from infi.logging.plugins.request_id_tag import get_tag as get_request_id_tag
 
 from .. import json_traceback
-from ..errors import RPCException, InvalidReturnValue, InvalidRPCMethod
+from ..errors import RPCException, InvalidReturnValue, InvalidRPCMethod, InternalServerError
 from .utils import format_request
 
 RPC_RESULT_CODE_SUCCESS = 'success'
@@ -89,7 +89,10 @@ def encode_rpc_result_success(result):
 
 
 def encode_rpc_result_exc_info(exc_info, with_traceback=None):
-    result = encode_rpc_result_exception(exc_info[1])
+    if isinstance(exc_info[1], RPCException):
+        result = encode_rpc_result_exception(exc_info[1])
+    else:
+        result = encode_rpc_result_exception(InternalServerError(exc_info[1]))
     if with_traceback is True or (with_traceback is None and getattr(exc_info[1], 'log_with_traceback', False)):
         result['server_side_traceback'] = json_traceback.format_tb(exc_info[2])
     return result
@@ -104,9 +107,8 @@ def encode_rpc_result_invalid_rpc_method_exc_info(name):
 
 
 def encode_rpc_result_exception(exception):
-    # FIXME check if the exception is an RPC exception, otherwise convert it to an RPC exception
+    assert isinstance(exception, RPCException)
     return dict(code=RPC_RESULT_CODE_ERROR, exception=exception.to_dict())
-
 
 def encode_rpc_result_deferred(uuid):
     return dict(code=RPC_RESULT_CODE_DEFERRED, result=uuid)
@@ -122,4 +124,4 @@ def decode_rpc_result(result_dict):
     if code in (RPC_RESULT_CODE_DEFERRED, RPC_RESULT_CODE_SUCCESS):
         return code, result.result
     else:
-        return code, RPCException.from_dict(result.exception)
+        return code, result.exception
