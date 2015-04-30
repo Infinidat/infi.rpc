@@ -6,7 +6,7 @@ import sys
 from gevent import sleep
 from infi.pyutils.lazy import cached_method
 from infi.pyutils.contexts import contextmanager
-from infi.pyutils.decorators import _ipython_inspect_module
+from infi.pyutils.decorators import _ipython_inspect_module, wraps
 
 from .. import errors
 from .utils import SelfLoggerMixin
