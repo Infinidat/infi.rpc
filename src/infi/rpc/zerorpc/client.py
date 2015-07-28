@@ -30,7 +30,10 @@ class _ZeroRPCClient(zerorpc.Client):
         bufchan = BufferedChannel(channel, inqueue_size=kargs.get('slots', 100))
 
         xheader = self._context.hook_get_task_context()
-        request_event = bufchan.create_event(method, args, xheader)
+        if hasattr(bufchan, 'new_event'):
+            request_event = bufchan.new_event(method, args, xheader)
+        else:
+            request_event = bufchan.create_event(method, args, xheader)
         self._context.hook_client_before_request(request_event)
         bufchan.emit_event(request_event)
 
