@@ -59,7 +59,11 @@ class _ZeroRPCServer(zerorpc.Server, base.SelfLoggerMixin):
             else:
                 self.log_debug("invalid RPC method received: {}".format(event.name))
                 result = base.encode_rpc_result_invalid_rpc_method_exc_info(event.name)
-                reply_event = bufchan.create_event('OK', (result,), self._context.hook_get_task_context())
+
+                if hasattr(bufchan, 'new_event'):
+                    reply_event = bufchan.new_event('OK', (result,), self._context.hook_get_task_context())
+                else:
+                    reply_event = bufchan.create_event('OK', (result,), self._context.hook_get_task_context())
                 self._context.hook_server_after_exec(event, reply_event)
                 bufchan.emit_event(reply_event)
         except:
