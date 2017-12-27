@@ -137,13 +137,15 @@ class Client(SelfLoggerMixin):  # pragma: no cover
 
     :param transport: transport object to use (e.g. :py:class:`ZeroRPCClientTransport`)
     """
-    def __init__(self, transport):
+    def __init__(self, transport, poll_sleep_interval=POLL_SLEEP_INTERVAL_IN_SECONDS):
         self._cache = dict()
         self._transport = transport
+        self.poll_sleep_interval = poll_sleep_interval
 
     def call(self, method_name, *args, **kwargs):
         try:
             async = kwargs.pop('async_rpc', False)
+            poll_sleep_interval = kwargs.pop('async_rpc_poll_interval', None)
 
             self._transport.connect()
 
@@ -153,7 +155,7 @@ class Client(SelfLoggerMixin):  # pragma: no cover
             self.log_debug("sending RPC request {}".format(rpc_call))
             result = self._transport.call(arg)
 
-            return self._handle_rpc_result(result, rpc_call, async)
+            return self._handle_rpc_result(result, rpc_call, async, poll_sleep_interval)
         except errors.TimeoutExpired:
             exc_info = sys.exc_info()
             self.log_debug("got {}: {}".format(exc_info[1].__class__.__name__, exc_info[1].message))
@@ -165,7 +167,7 @@ class Client(SelfLoggerMixin):  # pragma: no cover
                                                                                  close_exc_info[1].message))
             raise exc_info[0], exc_info[1], exc_info[2]
 
-    def _handle_rpc_result(self, result_dict, rpc_call, async=False):
+    def _handle_rpc_result(self, result_dict, rpc_call, async=False, poll_sleep_interval=None):
         try:
             code, result = decode_rpc_result(result_dict)
         except (errors.InvalidRPCMethod, errors.InvalidCallArguments), error:
@@ -178,15 +180,18 @@ class Client(SelfLoggerMixin):  # pragma: no cover
         if code in (RPC_RESULT_CODE_SUCCESS, RPC_RESULT_CODE_ERROR):
             deferred = ImmediateResult(code == RPC_RESULT_CODE_SUCCESS, result)
         else:
-            deferred = self._create_deferred_result(result)
+            deferred = self._create_deferred_result(result, poll_sleep_interval)
 
         if async:
             return deferred
         else:
             return deferred.get_result()
 
-    def _create_deferred_result(self, result):
-        return AsyncDeferredResult(self, result)
+    def _create_deferred_result(self, request_id, poll_sleep_interval):
+        result = AsyncDeferredResult(self, request_id, self.poll_sleep_interval)
+        if poll_sleep_interval is not None:
+            result.poll_sleep_interval = poll_sleep_interval
+        return result
 
     def _handle_invalid_rpc_exception(self, error):
         _type, value, traceback = sys.exc_info()
@@ -248,8 +253,8 @@ class AutoTimeoutClient(Client):
     :param transport: transport object to use (e.g. :py:class:`ZeroRPCClientTransport`)
     """
 
-    def __init__(self, transport, timeout_calc_func=mul_by_two_or_min_one):
-        super(AutoTimeoutClient, self).__init__(transport)
+    def __init__(self, transport, poll_sleep_interval=POLL_SLEEP_INTERVAL_IN_SECONDS, timeout_calc_func=mul_by_two_or_min_one):
+        super(AutoTimeoutClient, self).__init__(transport, poll_sleep_interval)
         self._timeout_calc_func = timeout_calc_func
         self._server_max_response_time = None
         self._auto_timeout_set = False
