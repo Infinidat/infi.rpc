@@ -2,7 +2,7 @@
 # Copyright 2013 Infinidat Ltd. All rights reserved.
 # Use is subject to license terms.
 #
-from __future__ import absolute_import
+
 import sys
 import zerorpc
 import zmq
@@ -105,14 +105,14 @@ class ZeroRPCClientTransport(base.ClientTransport, base.SelfLoggerMixin):
         """
         try:
             return self._zerorpc.__call__('on_call', arg)
-        except zerorpc.exceptions.TimeoutExpired, error:
-            self.log_debug("got zerorpc.exceptions.TimeoutExpired: {}".format(error.message))
+        except zerorpc.exceptions.TimeoutExpired as error:
+            self.log_debug("got zerorpc.exceptions.TimeoutExpired: {}".format(error))
             try:
                 self.close()
             except:
                 exc_info = sys.exc_info()
-                self.log_debug("encountered error on socket close: {}".format(exc_info[1].message))
-            raise errors.TimeoutExpired(error.message)
+                self.log_debug("encountered error on socket close: {}".format(exc_info[1]))
+            raise errors.TimeoutExpired(error)
 
     def set_timeout(self, timeout):
         """Sets the timeout to be used from here on when making (new) RPC calls."""

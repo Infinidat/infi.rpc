@@ -42,5 +42,5 @@ class ServerRPCTestCase(TestCase):
             result_2 = client_2.sync_call(async_rpc=True)
             self.assertFalse(result_1.is_done())
             self.assertFalse(result_2.is_done())
-            self.assertEquals(1, result_1.get_result())
-            self.assertEquals(1, result_2.get_result())
+            self.assertEqual(1, result_1.get_result())
+            self.assertEqual(1, result_2.get_result())

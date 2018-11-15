@@ -158,20 +158,20 @@ class Client(SelfLoggerMixin):  # pragma: no cover
             return self._handle_rpc_result(result, rpc_call, async, poll_sleep_interval)
         except errors.TimeoutExpired:
             exc_info = sys.exc_info()
-            self.log_debug("got {}: {}".format(exc_info[1].__class__.__name__, exc_info[1].message))
+            self.log_debug("got {}: {}".format(exc_info[1].__class__.__name__, exc_info[1]))
             try:
                 self._transport.close()
             except:
                 close_exc_info = sys.exc_info()
                 self.log_debug("encountered {} error on socket close: {}".format(close_exc_info[1].__class__.__name__,
-                                                                                 close_exc_info[1].message))
-            raise exc_info[0], exc_info[1], exc_info[2]
+                                                                                 close_exc_info[1]))
+            raise exc_info[0](exc_info[1]).with_traceback(exc_info[2])
 
     def _handle_rpc_result(self, result_dict, rpc_call, async=False, poll_sleep_interval=None):
         try:
             code, result = decode_rpc_result(result_dict)
-        except (errors.InvalidRPCMethod, errors.InvalidCallArguments), error:
-            self.log_error("sent invalid RPC call {}: {}".format(rpc_call, error.message))
+        except (errors.InvalidRPCMethod, errors.InvalidCallArguments) as error:
+            self.log_error("sent invalid RPC call {}: {}".format(rpc_call, error))
             self._handle_invalid_rpc_exception(error)
             assert False  # should never reach here since _handle_invalid_rpc_exception will raise or abort
             return
@@ -195,7 +195,7 @@ class Client(SelfLoggerMixin):  # pragma: no cover
 
     def _handle_invalid_rpc_exception(self, error):
         _type, value, traceback = sys.exc_info()
-        raise _type, value, traceback
+        raise _type(value).with_traceback(traceback)
 
     @cached_method
     def _get_rpc_method_names(self):

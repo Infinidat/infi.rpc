@@ -8,12 +8,12 @@ class RPCException(Exception):
     log_with_traceback = True
 
     def to_dict(self, with_traceback=None):
-        return dict(pickled=jsonpickle.encode(self), message=self.message, args=self.args)
+        return dict(pickled=jsonpickle.encode(self), message=str(self), args=self.args)
 
     @classmethod
     def from_dict(cls, result_dict):
         error = jsonpickle.decode(result_dict['pickled'])
-        for key, value in result_dict.iteritems():
+        for key, value in result_dict.items():
             if key == 'pickled':
                 continue
             setattr(error, key, value)

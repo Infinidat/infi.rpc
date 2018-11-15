@@ -38,7 +38,7 @@ class AsyncRPCTestCase(TestCase):
         with async_server_context(FooService()) as server:
             client_transport = ZeroRPCClientTransport.create_tcp(8192)
             client = Client(client_transport)
-            self.assertEquals(client.foo(), 42)
+            self.assertEqual(client.foo(), 42)
             self.assertFalse(server.has_deferred_requests())
 
     def test_abandon_deferred_requests(self):
@@ -59,7 +59,7 @@ class AsyncRPCTestCase(TestCase):
             self.assertTrue(server.has_deferred_requests())
             g = gevent.spawn(deferred.get_result)
             server.wait_for_empty_deferred_requests()
-            self.assertEquals(24, g.get())
+            self.assertEqual(24, g.get())
             server.garbage_collect_deferred_results()
             self.assertFalse(server.has_deferred_requests())
 

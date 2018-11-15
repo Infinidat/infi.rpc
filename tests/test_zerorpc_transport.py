@@ -39,8 +39,8 @@ class ZeroRPCTransportTestCase(TestCase):
 
         with server_bind_context(foo):
             with client_connect_context() as client:
-                self.assertEquals(42, client.call(1))
-                self.assertEquals(42, client.call(2))
+                self.assertEqual(42, client.call(1))
+                self.assertEqual(42, client.call(2))
 
     def test_client_timeout_expired(self):
         client = ZeroRPCClientTransport.create_tcp(PORT, timeout=0.1)
@@ -57,4 +57,4 @@ class ZeroRPCTransportTestCase(TestCase):
             import zerorpc
             client = zerorpc.Client("tcp://localhost:9898")
             result = client.unknown_func(1)
-            self.assertEquals(result['code'], RPC_RESULT_CODE_ERROR)
+            self.assertEqual(result['code'], RPC_RESULT_CODE_ERROR)

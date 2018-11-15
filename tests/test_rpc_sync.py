@@ -17,6 +17,6 @@ class SyncRPCTestCase(TestCase):
 
             client_transport = ZeroRPCClientTransport.create_tcp(8192)
             client = Client(client_transport)
-            self.assertEquals(client.foo(), 42)
+            self.assertEqual(client.foo(), 42)
         finally:
             server.unbind()

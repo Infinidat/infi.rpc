@@ -61,6 +61,6 @@ def format_list(extracted_list):
         relpath = "{}:{}".format(filename.replace(BASEDIR + sep, ''), str(lineno))
         item = dict(line=line, name=name, locals=dict(), relpath=relpath)
         if isinstance(_locals, dict):
-            item['locals'] = {key: safe_json_repr(value) for key, value in _locals.iteritems()}
+            item['locals'] = {key: safe_json_repr(value) for key, value in _locals.items()}
         list.append(item)
     return list
