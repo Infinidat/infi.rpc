@@ -4,6 +4,7 @@
 #
 import sys
 from gevent import sleep
+from six import reraise
 from infi.pyutils.lazy import cached_method
 from infi.pyutils.contexts import contextmanager
 from infi.pyutils.decorators import _ipython_inspect_module, wraps
@@ -165,7 +166,7 @@ class Client(SelfLoggerMixin):  # pragma: no cover
                 close_exc_info = sys.exc_info()
                 self.log_debug("encountered {} error on socket close: {}".format(close_exc_info[1].__class__.__name__,
                                                                                  close_exc_info[1]))
-            raise exc_info[0](exc_info[1]).with_traceback(exc_info[2])
+            reraise(exc_info[0], exc_info[1], exc_info[2])
 
     def _handle_rpc_result(self, result_dict, rpc_call, async=False, poll_sleep_interval=None):
         try:
@@ -195,7 +196,7 @@ class Client(SelfLoggerMixin):  # pragma: no cover
 
     def _handle_invalid_rpc_exception(self, error):
         _type, value, traceback = sys.exc_info()
-        raise _type(value).with_traceback(traceback)
+        reraise(_type, value, traceback)
 
     @cached_method
     def _get_rpc_method_names(self):
