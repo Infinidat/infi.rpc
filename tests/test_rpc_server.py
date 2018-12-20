@@ -1,3 +1,4 @@
+from __future__ import print_function
 import gevent
 import logbook
 from unittest import TestCase
@@ -58,53 +59,53 @@ class ServerRPCTestCase(TestCase):
             client = create_client()
             result = client.no_delay_call(async_rpc=True)
             self.assertTrue(result.is_done())
-            self.assertEquals(1, result.get_result())
+            self.assertEqual(1, result.get_result())
 
     def test_delay_call__above_max_response_time(self):
         with server_context(FooService(), max_response_time=0.5):
             client = create_client()
             result = client.delay_call(async_rpc=True)
             self.assertFalse(result.is_done())
-            self.assertEquals(2, result.get_result())
+            self.assertEqual(2, result.get_result())
 
     def test_delay_call__below_max_response_time(self):
         with server_context(FooService(), max_response_time=2):
             client = create_client()
             result = client.delay_call(async_rpc=True)
             self.assertTrue(result.is_done())
-            self.assertEquals(2, result.get_result())
+            self.assertEqual(2, result.get_result())
 
     def test_no_delay_deferred_call(self):
         with server_context(FooService(), max_response_time=1):
             client = create_client()
             result = client.no_delay_deferred_call(async_rpc=True)
             self.assertFalse(result.is_done())
-            self.assertEquals(3, result.get_result())
+            self.assertEqual(3, result.get_result())
 
     def test_delay_deferred_call__below_max_response_time(self):
         with server_context(FooService(), max_response_time=2):
             client = create_client()
             result = client.delay_deferred_call(async_rpc=True)
             self.assertFalse(result.is_done())
-            self.assertEquals(4, result.get_result())
+            self.assertEqual(4, result.get_result())
 
     def test_delay_deferred_call__above_max_response_time(self):
         with server_context(FooService(), max_response_time=0.5):
             client = create_client()
             result = client.delay_deferred_call(async_rpc=True)
             self.assertFalse(result.is_done())
-            self.assertEquals(4, result.get_result())
+            self.assertEqual(4, result.get_result())
 
     def test_auto_timeout_client__timeout_implicilty_found(self):
         with server_context(FooService(), max_response_time=0.5):
             client = AutoTimeoutClient(ZeroRPCClientTransport.create_tcp(8192))
             client.no_delay_call()
-            self.assertEquals(0.5, client.get_server_max_response_time())
+            self.assertEqual(0.5, client.get_server_max_response_time())
 
     def test_auto_timeout_client__timeout_explicitly_found(self):
         with server_context(FooService(), max_response_time=0.5):
             client = AutoTimeoutClient(ZeroRPCClientTransport.create_tcp(8192))
-            self.assertEquals(0.5, client.get_server_max_response_time())
+            self.assertEqual(0.5, client.get_server_max_response_time())
 
     def test_auto_timeout_client__short_timeout_on_stuck_server(self):
         import time
@@ -115,7 +116,7 @@ class ServerRPCTestCase(TestCase):
 
         def thread_server(wait_for_start, wait_for_close):
             try:
-                print("starting server, hub: {}".format(gevent.hub.get_hub()))
+                print(("starting server, hub: {}".format(gevent.hub.get_hub())))
                 with logbook.NullHandler().applicationbound():
                     with server_context(FooService(), max_response_time=0.1):
                         print("server started.")
@@ -133,7 +134,7 @@ class ServerRPCTestCase(TestCase):
         t.spawn(thread_server, wait_for_start, wait_for_close)
 
         try:
-            print("starting client, hub: {}".format(gevent.hub.get_hub()))
+            print(("starting client, hub: {}".format(gevent.hub.get_hub())))
             client = AutoTimeoutClient(ZeroRPCClientTransport.create_tcp(8192), timeout_calc_func=lambda n: n * 2)
             wait_for_start.wait()
             print("client started.")

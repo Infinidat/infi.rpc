@@ -2,7 +2,7 @@
 # Copyright 2013 Infinidat Ltd. All rights reserved.
 # Use is subject to license terms.
 #
-from __future__ import absolute_import
+
 import types
 from gevent.lock import RLock
 from infi.pyutils.decorators import wraps

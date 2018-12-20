@@ -2,7 +2,7 @@
 # Copyright 2013 Infinidat Ltd. All rights reserved.
 # Use is subject to license terms.
 #
-from __future__ import absolute_import
+
 import sys
 import functools
 import gevent
@@ -32,7 +32,7 @@ def validate_call_arguments(func, args, kwargs):
     """
     try:
         getcallargs(func, *args, **kwargs)
-    except Exception, error:
+    except Exception as error:
         raise InvalidCallArguments(str(error))
 
 
@@ -212,7 +212,7 @@ class AsyncMixin(object):
         """Removes unclaimed results that finished more than ``interval_to_keep_result`` seconds ago."""
         uuids_to_delete = set()
         now = time()
-        for uuid, req in self._deferred_requests.iteritems():
+        for uuid, req in self._deferred_requests.items():
             if req.state == AsyncRequest.RESULT_AVAILABLE and now > (req.finish_time + self._interval_to_keep_result):
                 uuids_to_delete.add(uuid)
         for uuid in uuids_to_delete:
