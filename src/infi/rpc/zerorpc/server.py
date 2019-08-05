@@ -23,8 +23,8 @@ logger = logbook.Logger("infi.rpc")
 
 class _ZeroRPCServer(zerorpc.Server, base.SelfLoggerMixin):
     def __init__(self, address, callback, name=None, context=None, pool_size=None):
-        zerorpc.Server.__init__(self, dict(on_call=callback), name, context, pool_size)
         self._address = address
+        zerorpc.Server.__init__(self, dict(on_call=callback), name, context, pool_size)
 
         zerorpc.Server.bind(self, self._address)
 
