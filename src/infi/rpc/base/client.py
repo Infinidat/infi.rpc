@@ -145,7 +145,7 @@ class Client(SelfLoggerMixin):  # pragma: no cover
 
     def call(self, method_name, *args, **kwargs):
         try:
-            async = kwargs.pop('async_rpc', False)
+            async_rpc = kwargs.pop('async_rpc', False)
             poll_sleep_interval = kwargs.pop('async_rpc_poll_interval', None)
 
             self._transport.connect()
@@ -156,7 +156,7 @@ class Client(SelfLoggerMixin):  # pragma: no cover
             self.log_debug("sending RPC request {}".format(rpc_call))
             result = self._transport.call(arg)
 
-            return self._handle_rpc_result(result, rpc_call, async, poll_sleep_interval)
+            return self._handle_rpc_result(result, rpc_call, async_rpc, poll_sleep_interval)
         except errors.TimeoutExpired:
             exc_info = sys.exc_info()
             self.log_debug("got {}: {}".format(exc_info[1].__class__.__name__, exc_info[1]))
@@ -168,7 +168,7 @@ class Client(SelfLoggerMixin):  # pragma: no cover
                                                                                  close_exc_info[1]))
             reraise(exc_info[0], exc_info[1], exc_info[2])
 
-    def _handle_rpc_result(self, result_dict, rpc_call, async=False, poll_sleep_interval=None):
+    def _handle_rpc_result(self, result_dict, rpc_call, async_rpc=False, poll_sleep_interval=None):
         try:
             code, result = decode_rpc_result(result_dict)
         except (errors.InvalidRPCMethod, errors.InvalidCallArguments) as error:
@@ -183,7 +183,7 @@ class Client(SelfLoggerMixin):  # pragma: no cover
         else:
             deferred = self._create_deferred_result(result, poll_sleep_interval)
 
-        if async:
+        if async_rpc:
             return deferred
         else:
             return deferred.get_result()
